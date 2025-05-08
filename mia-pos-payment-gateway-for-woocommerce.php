@@ -65,7 +65,7 @@ function mia_pos_init() {
         $plugin_version = $plugin_data['Version'];
     
         // Enqueue the custom CSS file with the plugin version
-        wp_enqueue_style('mia-pos-payment-gateway-styles', MIA_POS_PLUGIN_DIR . 'assets/css/style.css', array(), $plugin_version);
+        wp_enqueue_style('mia-pos-payment-gateway-styles', plugin_dir_url(__FILE__) . '/assets/css/style.css', array(), $plugin_version);
     }
 }
 add_action('plugins_loaded', 'mia_pos_init');
