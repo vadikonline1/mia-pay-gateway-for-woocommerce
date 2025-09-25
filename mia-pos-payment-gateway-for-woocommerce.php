@@ -134,3 +134,33 @@ function mia_payment_gateway_activation() {
         wp_die(__('Please install and activate WooCommerce before activating this plugin.', 'mia-pos-payment-gateway-for-woocommerce'));
     }
 } 
+
+
+// Auto-update from GitHub
+add_filter('site_transient_update_plugins', function($transient){
+    if(empty($transient->checked)) return $transient;
+
+    $plugin_slug = plugin_basename(__FILE__);
+    $remote_url = 'https://raw.githubusercontent.com/finergy-tech/mia-pay-gateway-for-woocommerce/main/mia-pos-payment-gateway-for-woocommerce.php
+';
+
+    $response = wp_remote_get($remote_url);
+    if(is_wp_error($response)) return $transient;
+
+    $remote_plugin_data = $response['body'];
+
+    if(preg_match('/Version:\s*(\S+)/', $remote_plugin_data, $matches)){
+        $remote_version = $matches[1];
+        $current_version = $transient->checked[$plugin_slug];
+
+        if(version_compare($remote_version, $current_version, '>')){
+            $transient->response[$plugin_slug] = (object) [
+                'slug' => $plugin_slug,
+                'new_version' => $remote_version,
+                'url' => 'https://raw.githubusercontent.com/finergy-tech/mia-pay-gateway-for-woocommerce/',
+                'package' => 'https://raw.githubusercontent.com/finergy-tech/mia-pay-gateway-for-woocommerce/archive/refs/heads/main.zip'
+            ];
+        }
+    }
+    return $transient;
+});
